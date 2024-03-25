@@ -9,11 +9,25 @@ import tkinter
 import os
 import csv
 import cv2 
-import pandas as pd
 import time
 import threading
+import train_model as tm
+import rec_attendance as rc
+from threading import Thread
+
 
 data_dir_name = './dataset/'
+
+def rec_attendance():
+     if r5["text"] == "Capture Attendance":
+          r5.configure(text="Stop Capture")
+          thread = Thread(target=rc.capture_attendance)
+          thread.start()
+          
+     else:
+          rc.stop_capture()
+          r5.configure(text="Capture Attendance")
+
 def student_frame():
     root1= Toplevel(window)
     root1.geometry("750x250")
@@ -36,7 +50,7 @@ def student_frame():
     bd=10,
     font=("times new roman", 16),
     bg="black",
-    fg="yellow",
+    fg="blue",
     height=2,
     width=17,
 )
@@ -113,15 +127,17 @@ def view_attendance():
     new.geometry("%dx%d+%d+%d" % (width, height, x, y))
     new.resizable(0, 0)
     tree = ttk.Treeview(new, show="headings")
-    with open('attendance.csv', 'r', newline='') as file:
+    with open('entry_log.csv', 'r', newline='') as file:
                 csv_reader = csv.reader(file)
-                header = next(csv_reader)  # Read the header row
-                tree.delete(*tree.get_children())  # Clear the current data
+                header = ["usn","time"]  # Read the header row
+                tree.delete(*tree.get_children()) 
+                print(header)
 
                 tree["columns"] = header
                 for col in header:
                     tree.heading(col, text=col)
                     tree.column(col, width=100)
+
 
                 for row in csv_reader:
                     tree.insert("", "end", values=row)
@@ -137,7 +153,7 @@ a = tk.Label(
     window,
     text="Face Recognition",
     bg="black",
-    fg="yellow",
+    fg="blue",
     bd=10,
     font=("arial", 35),
 )
@@ -151,7 +167,7 @@ r2 = tk.Button(
     bd=10,
     font=("times new roman", 16),
     bg="black",
-    fg="yellow",
+    fg="blue",
     height=2,
     width=17,
 )
@@ -164,12 +180,24 @@ r1 = tk.Button(
     bd=10,
     font=("times new roman", 16),
     bg="black",
-    fg="yellow",
+    fg="blue",
     height=2,
     width=17,
 )
 r1.place(x=1000, y=520)
 
+r4= tk.Button(
+    window,
+    text="train photos",
+    command=tm.train_photo,
+    bd=10,
+    font=("times new roman", 16),
+    bg="black",
+    fg="blue",
+    height=2,
+    width=17,
+)
+r4.place(x=300, y=520)
 r3 = tk.Button(
     window,
     text="EXIT",
@@ -177,11 +205,24 @@ r3 = tk.Button(
     command=quit,
     font=("times new roman", 16),
     bg="black",
-    fg="yellow",
+    fg="blue",
     height=2,
     width=17,
 )
 r3.place(x=600, y=660)
+
+r5 = tk.Button(
+    window,
+    text="Capture Attendance",
+    command=rec_attendance,
+    bd=10,
+    font=("times new roman", 16),
+    bg="black",
+    fg="blue",
+    height=2,
+    width=17,
+)
+r5.place(x=600, y=320)
 
 window.mainloop()
 
