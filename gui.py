@@ -13,10 +13,14 @@ import time
 import threading
 import train_model as tm
 import rec_attendance as rc
+from picamera2 import Picamera2, Preview
 from threading import Thread
 
-
 data_dir_name = './dataset/'
+
+def custom_quit():
+    rc.stop_capture()
+    quit()
 
 def rec_attendance():
      if r5["text"] == "Capture Attendance":
@@ -70,9 +74,12 @@ def capture(text_box,):
              os.mkdir(data_dir_name + x) 
              open_camera(data_dir_name,x)
 
-def open_camera(dir_name,name): 
-
-    cam = cv2.VideoCapture(0)
+def open_camera(dir_name,name):
+    
+    picam = Picamera2()
+    config = picam.create_preview_configuration({'format': 'RGB888'})
+    picam.configure(config)
+    picam.start()   
 
     cv2.namedWindow("press space to take a photo", cv2.WINDOW_NORMAL)
     cv2.resizeWindow("press space to take a photo", 500, 300)
@@ -80,11 +87,8 @@ def open_camera(dir_name,name):
     img_counter = 0
 
     while True:
-        ret, frame = cam.read()
-        if not ret:
-            print("failed to grab frame")
-            break
-        cv2.imshow("press space to take a photo", frame)
+        image = picam.capture_array()
+        cv2.imshow("press space to take a photo", image)
 
         k = cv2.waitKey(1)
         if k%256 == 27:
@@ -94,11 +98,11 @@ def open_camera(dir_name,name):
         elif k%256 == 32:
             # SPACE pressed
             img_name = dir_name + name +"/image_{}.jpg".format(img_counter)
-            cv2.imwrite(img_name, frame)
+            cv2.imwrite(img_name, image)
             print("{} written!".format(img_name))
             img_counter += 1
 
-    cam.release()
+    picam.close()
 
     cv2.destroyAllWindows()
     
@@ -202,7 +206,7 @@ r3 = tk.Button(
     window,
     text="EXIT",
     bd=10,
-    command=quit,
+    command=custom_quit,
     font=("times new roman", 16),
     bg="black",
     fg="blue",
