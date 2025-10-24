@@ -126,4 +126,6 @@ Project Link: https://github.com/goldkrs/MyProj1
 ## Acknowledgments
 
 - Raspberry Pi documentation and Picamera2 examples  
-- OpenCV tutorials for face detection and recognition  
+- OpenCV tutorials for face detection and recognition
+## License
+This project is licensed under the MIT License.  
